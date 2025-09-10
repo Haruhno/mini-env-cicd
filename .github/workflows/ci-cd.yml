@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # --- Récupération du code ---
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -20,20 +21,27 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # --- Donner les permissions au Maven Wrapper ---
+      - name: Make Maven Wrapper executable
+        run: chmod +x ./imageupload/mvnw
+
       - name: Build Spring Boot JAR
         run: ./imageupload/mvnw clean package -DskipTests
 
+      # --- Build des images Docker ---
       - name: Build Docker images
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/springboot-app:latest ./imageupload
           docker build -t ${{ secrets.DOCKER_USERNAME }}/flask-service:latest ./flask-image-service
 
+      # --- Login Docker Hub avec token ---
       - name: Log in to Docker Hub using token
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
+      # --- Push des images sur Docker Hub ---
       - name: Push Docker images to Docker Hub
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/springboot-app:latest
