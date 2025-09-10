@@ -4,12 +4,12 @@ FROM python:3.11-slim
 # Dossier de travail
 WORKDIR /app
 
-# Copie les fichiers requirements si tu en as un
-COPY flask-image-service/requirements.txt requirements.txt
+# Copie des fichiers requirements
+COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copie le reste du code
-COPY flask-image-service/ .
+COPY . .
 
 # Expose le port de Flask
 EXPOSE 5000
