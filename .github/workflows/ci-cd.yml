@@ -28,11 +28,11 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/springboot-app:latest ./imageupload
           docker build -t ${{ secrets.DOCKER_USERNAME }}/flask-service:latest ./flask-image-service
 
-      - name: Log in to Docker Hub
+      - name: Log in to Docker Hub using token
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Push Docker images to Docker Hub
         run: |
