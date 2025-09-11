@@ -30,7 +30,11 @@ def upload_image():
         )
         return jsonify({"message": "Image uploaded successfully", "image_id": image_id}), 201
     except Exception as e:
+        # Affiche la stack trace complète dans les logs Flask
+        import traceback
+        print(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/api/images/<image_id>', methods=['GET'])
 def get_image(image_id):
@@ -46,5 +50,6 @@ def get_image(image_id):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
 
 
