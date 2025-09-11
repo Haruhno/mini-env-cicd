@@ -13,6 +13,7 @@ email_service = EmailService(app)
 
 @app.route('/api/images/upload', methods=['POST'])
 def upload_image():
+    print(request.files)  # <-- debug
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
     
@@ -48,6 +49,8 @@ def get_image(image_id):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+    
+
 
 
 
