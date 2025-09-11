@@ -68,8 +68,11 @@ jobs:
             # Run MongoDB
             docker run -d --name mongo --network my-network -p 27017:27017 mongo:6
 
-            # Wait a bit to ensure Mongo is ready
-            sleep 10
+            # Attendre que MongoDB soit prêt
+            until docker exec mongo mongo --eval "db.adminCommand('ping')" >/dev/null 2>&1; do
+              echo "Waiting for MongoDB..."
+              sleep 2
+            done
 
             # Run Spring Boot
             docker run -d --name springboot-app --network my-network -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/springboot-app:latest
