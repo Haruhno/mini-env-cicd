@@ -1,26 +1,6 @@
 version: "3.8"
 
 services:
-  springboot-app:
-    build:
-      context: ./imageupload
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/testdb
-    depends_on:
-      - mongo
-
-  flask-service:
-    build:
-      context: ./flask-image-service
-      dockerfile: Dockerfile
-    ports:
-      - "5000:5000"
-    depends_on:
-      - mongo
-
   mongo:
     image: mongo:6
     container_name: mongo
@@ -28,6 +8,33 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  springboot-app:
+    image: yourdockerhubusername/springboot-app:latest
+    container_name: springboot-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/testdb
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  flask-service:
+    image: yourdockerhubusername/flask-service:latest
+    container_name: flask-service
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/image_db
+    depends_on:
+      mongo:
+        condition: service_healthy
 
 volumes:
   mongo-data:
