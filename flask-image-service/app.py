@@ -22,18 +22,16 @@ def upload_image():
     
     try:
         image_id = image_service.upload_image(file)
-        # Envoi email de confirmation
-        email_service.send_email(
-            to_email="user@example.com",  
-            subject="Image uploaded",
-            body=f"Votre image a été uploadée avec l'ID: {image_id}"
-        )
+        # Email désactivé temporairement pour tester
+        # email_service.send_email(
+        #     to_email="user@example.com",  
+        #     subject="Image uploaded",
+        #     body=f"Votre image a été uploadée avec l'ID: {image_id}"
+        # )
         return jsonify({"message": "Image uploaded successfully", "image_id": image_id}), 201
     except Exception as e:
-        # Affiche la stack trace complète dans les logs Flask
-        import traceback
-        print(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
+
 
 
 @app.route('/api/images/<image_id>', methods=['GET'])
@@ -50,6 +48,7 @@ def get_image(image_id):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
 
 
 
