@@ -32,6 +32,7 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/springboot-app:latest ./imageupload
           docker build -t ${{ secrets.DOCKER_USERNAME }}/flask-service:latest ./flask-image-service
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/mongo:6 ./mongo
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -43,6 +44,7 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/springboot-app:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/flask-service:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/mongo:6
 
       # --- Déploiement sur AWS EC2 ---
       - name: Deploy to EC2
@@ -53,29 +55,9 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
-
-            # Stop old containers if running
-            docker stop springboot-app || true
-            docker stop flask-service || true
-            docker stop mongo || true
-            docker rm springboot-app || true
-            docker rm flask-service || true
-            docker rm mongo || true
-
-            # Create network
-            docker network create my-network || true
-
-            # Run MongoDB
-            docker run -d --name mongo --network my-network -p 27017:27017 mongo:6
-
-            # Attendre que MongoDB soit prêt
-            until docker exec mongo mongo --eval "db.adminCommand('ping')" >/dev/null 2>&1; do
-              echo "Waiting for MongoDB..."
-              sleep 2
-            done
-
-            # Run Spring Boot
-            docker run -d --name springboot-app --network my-network -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/springboot-app:latest
-
-            # Run Flask
-            docker run -d --name flask-service --network my-network -p 5000:5000 ${{ secrets.DOCKER_USERNAME }}/flask-service:latest
+            
+            # Arrêt et suppression des anciens conteneurs
+            docker compose -f docker-compose.yml down
+            
+            # Démarrage des conteneurs avec Compose
+            docker compose -f docker-compose.yml up -d
