@@ -1,5 +1,5 @@
 class Config:
-    MONGO_URI = "mongodb://localhost:27017/image_db"
+    MONGO_URI = "mongodb://mongo:27017/image_db"
 
     # Configuration pour hMailServer local
     MAIL_SERVER = 'localhost'             # hMailServer local
@@ -9,3 +9,4 @@ class Config:
     MAIL_USERNAME = 'ed@monmail.com'    # Ton adresse créée
     MAIL_PASSWORD = 'changeme'          # Mot de passe associé
     MAIL_DEFAULT_SENDER = 'ed@monmail.com'
+
