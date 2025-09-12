@@ -13,25 +13,45 @@ email_service = EmailService(app)
 
 @app.route('/api/images/upload', methods=['POST'])
 def upload_image():
-    print(request.files)  # <-- debug
+    # Vérifie si le fichier est présent dans la requête
     if 'file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
+        return jsonify({"error": "No file part", "type": "Bad Request"}), 400
     
     file = request.files['file']
+    
+    # Vérifie si le fichier a un nom valide
     if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
+        return jsonify({"error": "No selected file", "type": "Bad Request"}), 400
     
     try:
+        # Tente d'uploader l'image
         image_id = image_service.upload_image(file)
-        # Email désactivé temporairement pour tester
+        
+        # Email désactivé temporairement
         # email_service.send_email(
         #     to_email="user@example.com",  
         #     subject="Image uploaded",
         #     body=f"Votre image a été uploadée avec l'ID: {image_id}"
         # )
-        return jsonify({"message": "Image uploaded successfully", "image_id": image_id}), 201
+        
+        return jsonify({
+            "message": "Image uploaded successfully", 
+            "image_id": image_id,
+            "type": "Success"
+        }), 201
+    
+    except FileNotFoundError as fnf_error:
+        # Exemple si le fichier ne peut pas être lu par le service
+        return jsonify({"error": str(fnf_error), "type": "File Not Found"}), 404
+    
+    except ValueError as val_error:
+        # Exemple si le service détecte un problème avec le fichier
+        return jsonify({"error": str(val_error), "type": "Invalid Value"}), 400
+    
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        # Toute autre erreur inattendue
+        return jsonify({"error": str(e), "type": "Internal Server Error"}), 500
+
 
 
 
@@ -48,8 +68,9 @@ def get_image(image_id):
     )
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
     
+
 
 
 
