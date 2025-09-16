@@ -76,4 +76,4 @@ jobs:
             docker run -d --name springboot-app --network my-network -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/springboot-app:latest
 
             # Run Flask
-            docker run -d --name flask-service --network my-network -p 5000:5000 ${{ secrets.DOCKER_USERNAME }}/flask-service:latest
+            docker run -d --name flask-service --network my-network -p 5001:5001 ${{ secrets.DOCKER_USERNAME }}/flask-service:latest
