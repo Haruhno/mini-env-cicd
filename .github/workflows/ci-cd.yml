@@ -73,7 +73,12 @@ jobs:
             docker run -d --name mongo --network my-network -p 27017:27017 ${{ secrets.DOCKER_USERNAME }}/mongo:6
 
             # Run Spring Boot
-            docker run -d --name springboot-app --network my-network -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/springboot-app:latest
+            docker run -d --name springboot-app \
+            --network my-network \
+            -p 8080:8080 \
+            -e SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/testdb \
+            ${{ secrets.DOCKER_USERNAME }}/springboot-app:latest
+
 
             # Run Flask
             docker run -d --name flask-service --network my-network -p 5001:5001 ${{ secrets.DOCKER_USERNAME }}/flask-service:latest
